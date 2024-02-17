@@ -1,6 +1,8 @@
 
 
+using Ecommerce.Repositorio.Contrato;
 using Ecommerce.Repositorio.DBContext;
+using Ecommerce.Repositorio.Implementacion;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,8 @@ builder.Services.AddDbContext<EcommerceContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("CadenaSQL"));
 });
 
+builder.Services.AddTransient(typeof(IGenericoRepositorio<>),typeof(GenericoRepositorio<>));
+builder.Services.AddScoped<IVentaRepositorio, VentaRepositorio>();
 
 
 var app = builder.Build();
