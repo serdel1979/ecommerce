@@ -23,5 +23,4 @@ builder.Services.AddScoped<IProductoServicio, ProductoServicio>();
 builder.Services.AddScoped<IDashboardServicio, DashboardServicio>();
 builder.Services.AddScoped<IVentaServicio, VentaServicio>();
 
-
 await builder.Build().RunAsync();
