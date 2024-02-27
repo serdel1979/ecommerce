@@ -1,7 +1,136 @@
 ﻿@page "/usuarios"
 
-<h3>Usuarios</h3>
+@using Ecommerce.DTO
+@using Ecommerce.WebAssembly.Servicios.Contrato
+@inject IUsuarioServicio usuarioServicio
+@inject IToastService toastService
+@inject SweetAlertService Swal
+
+<div class="row justify-content-center  mt-3">
+    <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
+        <div class="d-grid gap-1 col-12 mx-auto">
+            <a class="btn btn-primary" href="/usuario">Nuevo usuario</a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-8 col-xl-9 mb-4">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Buscar usuario..." @bind-value="buscar">
+            <button class="btn btn-outline-secondary" type="button" @onclick="(async()=> await ObtenerUsuarios(buscar))">
+                <!-- <i class="oi oi-magnifying-glass"></i> -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 8 8"><path fill="currentColor" d="M3.5 0C1.57 0 0 1.57 0 3.5S1.57 7 3.5 7c.59 0 1.17-.14 1.66-.41a1 1 0 0 0 .13.13l1 1a1.02 1.02 0 1 0 1.44-1.44l-1-1a1 1 0 0 0-.16-.13c.27-.49.44-1.06.44-1.66c0-1.93-1.57-3.5-3.5-3.5zm0 1C4.89 1 6 2.11 6 3.5c0 .66-.24 1.27-.66 1.72l-.03.03a1 1 0 0 0-.13.13c-.44.4-1.04.63-1.69.63c-1.39 0-2.5-1.11-2.5-2.5s1.11-2.5 2.5-2.5z" /></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row gx-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-start mt-2">
+
+
+    @if (lista != null)
+    {
+
+        foreach (var item in lista)
+        {
+            <div class="col mb-5">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="text-center">
+                            <!-- <i class="oi oi-person" style="font-size:50px"></i> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="currentColor" d="M256 256a112 112 0 1 0-112-112a112 112 0 0 0 112 112m0 32c-69.42 0-208 42.88-208 128v64h416v-64c0-85.12-138.58-128-208-128" /></svg>
+                        </div>
+                        <div class="text-start">
+                            <p class="m-1"><b>Nombre: </b>@item.Nombrecompleto</p>
+                            <p class="m-1"><b>Correo: </b>@item.Correo</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="row justify-content-between">
+                            <a class="col-5 btn btn-sm btn-outline-primary mt-auto" href="/usuario/@item.Idusuario">
+                              <!--  <i class="oi oi-pencil fs-5"></i>  -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1l1-4ZM15 5l3 3" /></svg>
+                             </a>
+                            <button class="col-5 btn btn-sm btn-outline-danger mt-auto" type="button" @onclick="(async () => await Eliminar(item))">
+                               <!-- <i class="oi oi-trash fs-5"></i> -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8" /><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+    else
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+
+</div>
+
 
 @code {
+    private List<UsuarioDTO> lista = null;
+    private string buscar = "";
+
+
+
+    private async Task ObtenerUsuarios(string valor = "")
+    {
+        var response = await usuarioServicio.Lista("Administrador", valor);
+
+        if (response.EsCorrecto)
+        {
+            lista = (List<UsuarioDTO>)response.Resultado!;
+        }
+        else
+        {
+            lista = new List<UsuarioDTO>();
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerUsuarios();
+    }
+
+    private async Task Eliminar(UsuarioDTO modelo)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Está seguro?",
+                Text = $"",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (result.IsConfirmed)
+        {
+            var response = await usuarioServicio.Eliminar(modelo.Idusuario);
+            if (response.EsCorrecto)
+            {
+                await ObtenerUsuarios();
+                toastService.ShowSuccess("El usuario fue eliminado");
+            }
+            else
+            {
+                toastService.ShowWarning(response.Mensaje);
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
 
 }
