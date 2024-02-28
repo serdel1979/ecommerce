@@ -152,7 +152,7 @@ namespace Ecommerce.Servicio.Implementacion
         {
             try
             {
-                var consulta = _modeloRepositorio.Consultar(p => p.Idcategoria == id).Include(c => c.IdcategoriaNavigation);
+                var consulta = _modeloRepositorio.Consultar(p => p.Idproducto == id).Include(c => c.IdcategoriaNavigation);
                 var fromModelo = await consulta.FirstOrDefaultAsync();
 
                 if (fromModelo != null)
