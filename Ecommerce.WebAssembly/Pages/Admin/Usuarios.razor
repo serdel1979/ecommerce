@@ -1,7 +1,6 @@
 ﻿@page "/usuarios"
 
-@using Ecommerce.DTO
-@using Ecommerce.WebAssembly.Servicios.Contrato
+
 @inject IUsuarioServicio usuarioServicio
 @inject IToastService toastService
 @inject SweetAlertService Swal
@@ -107,14 +106,13 @@
         if (response.EsCorrecto)
         {
             lista = (List<UsuarioDTO>)response.Resultado!;
-            loading = false;
         }
         else
         {
             lista = new List<UsuarioDTO>();
-            loading = false;
         }
-
+        loading = false;
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

@@ -1,7 +1,167 @@
 ﻿@page "/productos"
 
-<h3>Productos</h3>
+@inject IProductoServicio productoServicio
+@inject IToastService toastService
+@inject SweetAlertService Swal
+
+
+<div class="row justify-content-center  mt-3">
+    <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
+        <div class="d-grid gap-1 col-12 mx-auto">
+            <a class="btn btn-primary" href="/producto">Nuevo producto</a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-8 col-xl-9 mb-4">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Buscar producto..." @bind-value="buscar">
+            <button class="btn btn-outline-secondary" type="button" @onclick="(async()=> await ObtenerProductos(buscar))">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 8 8"><path fill="currentColor" d="M3.5 0C1.57 0 0 1.57 0 3.5S1.57 7 3.5 7c.59 0 1.17-.14 1.66-.41a1 1 0 0 0 .13.13l1 1a1.02 1.02 0 1 0 1.44-1.44l-1-1a1 1 0 0 0-.16-.13c.27-.49.44-1.06.44-1.66c0-1.93-1.57-3.5-3.5-3.5zm0 1C4.89 1 6 2.11 6 3.5c0 .66-.24 1.27-.66 1.72l-.03.03a1 1 0 0 0-.13.13c-.44.4-1.04.63-1.69.63c-1.39 0-2.5-1.11-2.5-2.5s1.11-2.5 2.5-2.5z" /></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row gx-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-start mt-2">
+
+    @if (loading)
+    {
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else
+    {
+
+            @if (lista != null)
+            {
+                if (lista.Count() > 0)
+                {
+                    foreach (var item in lista)
+                    {
+                        <div class="col mb-5">
+                            <div class="card h-100">
+                                <!-- Sale badge-->
+
+                                <div class="badge bg-primary text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Nuevo</div>
+
+                                <!-- Product image-->
+                                <img class="card-img-top border-dark border-1" src="@item.Imagen">
+                                <!-- Product details-->
+                                <div class="card-body p-4">
+                                    <div class="text-center">
+                                        <!-- Product name-->
+                                        <h5 class="fw-bolder">@item.Nombre</h5>
+                                        <!-- Product price-->
+                                       @if(item.Preciooferta != 0 && item.Preciooferta < item.Precio){
+                                            <span class="text-danger text-decoration-line-through">S/. @item.Precio</span>
+                                        <span>S /.@item.Preciooferta</span>
+                                        }
+                                        else
+                                        {
+                                            <span>S /.@item.Precio</span>
+                                        }
+
+                                    </div>
+                                </div>
+                                <!-- Product actions-->
+                                <div class="card-footer bg-transparent">
+                                    <div class="row justify-content-between">
+                                        <a class="col-5 btn btn-sm btn-outline-primary mt-auto" href="/producto/@item.Idproducto">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1l1-4ZM15 5l3 3" /></svg>
+                                        </a>
+                                        <button class="col-5 btn btn-sm btn-outline-danger mt-auto" @onclick="(async () => await Eliminar(item))">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8" /><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z" /></svg>
+
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+               
+                }
+                else
+                {
+                    <h3>No hay productos cargados!!!</h3>
+                }
+
+            }
+            else
+            {
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            }
+    }
+
+</div>
 
 @code {
+    private List<ProductoDTO> lista = null;
+    private string buscar = "";
+    private bool loading = false;
+
+    private void OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            // Llama al método buscar aquí
+            ObtenerProductos(buscar);
+        }
+    }
+
+    private async Task ObtenerProductos(string valor = "")
+    {
+        loading = true;
+        var response = await productoServicio.Lista(valor);
+
+        if (response.EsCorrecto)
+        {
+            lista = (List<ProductoDTO>)response.Resultado!;
+        }
+        else
+        {
+            lista = new List<ProductoDTO>();
+        }
+        loading = false;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ObtenerProductos();
+    }
+
+    private async Task Eliminar(ProductoDTO modelo)
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Está seguro?",
+                Text = $"",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, eliminar",
+                CancelButtonText = "No, cancelar",
+            });
+
+        if (result.IsConfirmed)
+        {
+            var response = await productoServicio.Eliminar(modelo.Idproducto);
+            if (response.EsCorrecto)
+            {
+                await ObtenerProductos();
+                toastService.ShowSuccess("El producto fue eliminado");
+            }
+            else
+            {
+                toastService.ShowWarning(response.Mensaje);
+            }
+        }
+
+    }
+
+
+
+
 
 }
