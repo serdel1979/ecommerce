@@ -1,8 +1,96 @@
 ﻿@page "/detalle/{id:int}"
 
+@inject IProductoServicio productoServicio
+@inject ICategoriaServicio categoriaServicio
+@inject IToastService toastService
+@inject SweetAlertService Swal
+@inject NavigationManager _navServicio
 
-<h3>Detalle</h3>
+@if (modelo != null)
+{
+    <div class="row gx-4 gx-lg-5 align-items-center" style="margin: 20px;">
+        <div class="col-md-6">
+            <img class="card-img-top border-dark border-1" src="@modelo.Imagen" style="width:100%;">
+        </div>
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bolder">@modelo.Nombre</h1>
+            <div class="fs-5 mb-5">
+                @if (modelo.Preciooferta != 0 && modelo.Preciooferta < modelo.Precio)
+                {
+                    <span class="text-danger text-decoration-line-through">S/. @modelo.Precio</span>
+                    <span>S /.@modelo.Preciooferta</span>
+                }
+                else
+                {
+                    <span>S /.@modelo.Precio</span>
+                }
+
+            </div>
+            <p class="lead">@modelo.Descripcion</p>
+            <div class="d-flex">
+                <input class="form-control text-center me-3" type="number" min="1" style="width:60px" @bind-value="cantidad">
+                <button class="btn btn-outline-dark flex-shrink-0 me-3" type="button" @onclick="(async() => await AgregarCarrito(modelo))">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M17 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M1 2v2h2l3.6 7.59l-1.36 2.45c-.15.28-.24.61-.24.96a2 2 0 0 0 2 2h12v-2H7.42a.25.25 0 0 1-.25-.25c0-.05.01-.09.03-.12L8.1 13h7.45c.75 0 1.41-.42 1.75-1.03l3.58-6.47c.07-.16.12-.33.12-.5a1 1 0 0 0-1-1H5.21l-.94-2M7 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2" />
+                    </svg>
+                    Agregar al carrito
+                </button>
+                <a class="btn btn-outline-dark flex-shrink-0" href="/catalogo">
+                    <i class="bi-cart-fill me-1"></i>
+                    Volver
+                </a>
+            </div>
+
+
+
+        </div>
+    </div>
+}
+else
+{
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+
 
 @code {
+
+
+    [Parameter]
+    public int id { get; set; }
+
+    private int cantidad = 0;
+
+    private ProductoDTO modelo = new ProductoDTO();
+
+    private async Task AgregarCarrito(ProductoDTO modelo)
+    {
+        
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id != 0)
+        {
+
+
+
+            var response = await productoServicio.Obtener(id);
+
+            if (response.EsCorrecto)
+            {
+                modelo = (ProductoDTO)response.Resultado!;
+            }
+            else
+            {
+                toastService.ShowWarning(response.Mensaje);
+            }
+
+        }
+
+    }
+
 
 }
