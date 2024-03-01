@@ -30,7 +30,7 @@ namespace Ecommerce.Servicio.Implementacion
             {
                 var consulta = _modeloRepositorio.Consultar(p =>
                      p.Nombre.ToLower().Contains(buscar.ToLower()) &&
-                     p.IdcategoriaNavigation.Nombre.ToLower().Contains(buscar.ToLower()));
+                     p.IdcategoriaNavigation.Nombre.ToLower().Contains(categoria.ToLower()));
 
 
                 List<ProductoDTO> lista = _mapper.Map<List<ProductoDTO>>(await consulta.ToListAsync());

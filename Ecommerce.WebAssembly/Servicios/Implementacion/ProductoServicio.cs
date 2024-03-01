@@ -15,6 +15,8 @@ namespace Ecommerce.WebAssembly.Servicios.Implementacion
 
         public async Task<ResponseDTO<List<ProductoDTO>>> Catalogo(string categoria, string buscar)
         {
+            Console.WriteLine(categoria);
+            Console.WriteLine(buscar);
             return await _httpClient.GetFromJsonAsync<ResponseDTO<List<ProductoDTO>>>($"Producto/Catalogo/{categoria}/{buscar}");
         }
 

@@ -17,7 +17,7 @@ namespace Ecommerce.API.Controllers
             this._productoServicio = productoServicio;
         }
 
-        [HttpGet("Lista/{buscar:alpha?}")]
+        [HttpGet("Lista/{buscar}")]
         public async Task<IActionResult> Lista(string buscar = "NA")
         {
 
