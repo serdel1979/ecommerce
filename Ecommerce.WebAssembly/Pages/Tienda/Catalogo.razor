@@ -6,11 +6,10 @@
 @inject SweetAlertService Swal
 
 <div class="row justify-content-center mt-3 mb-4">
-
     <div class="col-sm-6 col-md-8 col-xl-9">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Buscar producto..." @onkeypress="OnKeyPress" @bind-value="buscar">
-            <button class="btn btn-outline-secondary" type="button" @onclick="(async () => await  ObtenerCatalogo())">
+            <input type="text" class="form-control" placeholder="Buscar producto..." @onkeyup="OnKeyUp" @bind-value="buscar">
+            <button class="btn btn-outline-secondary" type="button" @onclick="(async () => await ObtenerCatalogo())">
                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 8 8"><path fill="currentColor" d="M3.5 0C1.57 0 0 1.57 0 3.5S1.57 7 3.5 7c.59 0 1.17-.14 1.66-.41a1 1 0 0 0 .13.13l1 1a1.02 1.02 0 1 0 1.44-1.44l-1-1a1 1 0 0 0-.16-.13c.27-.49.44-1.06.44-1.66c0-1.93-1.57-3.5-3.5-3.5zm0 1C4.89 1 6 2.11 6 3.5c0 .66-.24 1.27-.66 1.72l-.03.03a1 1 0 0 0-.13.13c-.44.4-1.04.63-1.69.63c-1.39 0-2.5-1.11-2.5-2.5s1.11-2.5 2.5-2.5z" /></svg>
             </button>
         </div>
@@ -64,50 +63,72 @@
     </div>
 
     <div class="col-sm-9">
-        <div class="row gx-4 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-start">
-            @if (listaProducto != null)
-            {
-                @foreach (var item in listaProducto)
-                {
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                        <!-- Sale badge-->
-
-                        <div class="badge bg-primary text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Nuevo</div>
-
-                        <!-- Product image-->
-                        <img class="card-img-top border-dark border-1" src="@item.Imagen" style="width:100%;height:250px">
-                        <!-- Product details-->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <!-- Product name-->
-                                <h5 class="fw-bolder">@item.Nombre</h5>
-                                <!-- Product price-->
-                                @if(item.Preciooferta != 0 && item.Preciooferta < item.Precio){
-                                    <span class="text-danger text-decoration-line-through">S/. @item.Precio</span>
-                                    <span>S /.@item.Preciooferta</span>
-                                }else{
-                                    <span>S /.@item.Precio</span>
-                                }
-                            </div>
-                        </div>
-                        <!-- Product actions-->
-                        <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-                            <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="/detalle/@item.Idproducto">Ver producto</a></div>
-                        </div>
-                    </div>
-                </div>
-                }
-            }
-            else
-            {
-                <div class="col mb-5 text-center">
+         @if (loading)
+        {
+                <div class="col-sm-9 text-center">
                     <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                 </div>
+        }
+        else
+        {
+        <div class="row gx-4 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-start">
+            @if (listaProducto != null)
+            {
+                    @if(listaProducto.Count > 0)
+                    {
+                        @foreach (var item in listaProducto)
+                        {
+                            <div class="col mb-5">
+                                <div class="card h-100">
+                                    <!-- Sale badge-->
+
+                                    <div class="badge bg-primary text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Nuevo</div>
+
+                                    <!-- Product image-->
+                                    <img class="card-img-top border-dark border-1" src="@item.Imagen" style="width:100%;height:250px">
+                                    <!-- Product details-->
+                                    <div class="card-body p-4">
+                                        <div class="text-center">
+                                            <!-- Product name-->
+                                            <h5 class="fw-bolder">@item.Nombre</h5>
+                                            <!-- Product price-->
+                                            @if (item.Preciooferta != 0 && item.Preciooferta < item.Precio)
+                                            {
+                                                <span class="text-danger text-decoration-line-through">S/. @item.Precio</span>
+                                                <span>S /.@item.Preciooferta</span>
+                                            }
+                                            else
+                                            {
+                                                <span>S /.@item.Precio</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <!-- Product actions-->
+                                    <div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
+                                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="/detalle/@item.Idproducto">Ver producto</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <h3>No se encontraron coincidencias!!!</h3>
+                    }
+                   
+            }
+            else
+            {
+                        <div class="col-sm-9 text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
             }
         </div>
+        }
     </div>
 </div>
 
@@ -120,14 +141,16 @@
     private bool loading = false;
 
 
-    private void OnKeyPress(KeyboardEventArgs e)
+    private void OnKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            // Llama al método buscar aquí
-            ObtenerCatalogo();
+            ObtenerCatalogo(buscar);
         }
     }
+
+
+
 
     private async Task ObtenerCategoria(string valor = "")
     {
@@ -148,10 +171,15 @@
 
 
 
-    private async Task ObtenerCatalogo()
+    private async Task ObtenerCatalogo(string buscado = "")
     {
         loading = true;
-        var response = await productoServicio.Catalogo(categoriaSeleccionada,buscar);
+
+        if(buscado != "")
+        {
+            buscar = buscado;
+        }
+        var response = await productoServicio.Catalogo(categoriaSeleccionada, buscar);
 
         if (response.EsCorrecto)
         {
