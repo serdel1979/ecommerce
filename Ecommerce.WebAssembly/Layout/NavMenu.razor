@@ -1,4 +1,15 @@
-﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light">
+﻿@using Ecommerce.WebAssembly.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject ICarritoServicio carritoServicio
+@implements IDisposable 
+@inject SweetAlertService Swal
+@inject NavigationManager _navigationManager
+@inject AuthenticationStateProvider autenticacionProvider;
+
+
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand" runat="server" href="#">Ecommerce</a>
         <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
@@ -8,34 +19,52 @@
         <div class="@NavMenuCssClass navbar-collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
 
-                <li class="nav-item" b-test><NavLink class="nav-link" href="dashboard"> Dashboard</NavLink></li>
-                <li class="nav-item"><NavLink class="nav-link" href="usuarios"> Usuarios</NavLink></li>
-                <li class="nav-item"><NavLink class="nav-link" href="categorias"> Categorias</NavLink></li>
-                <li class="nav-item"><NavLink class="nav-link" href="productos"> Productos</NavLink></li>
+                <AuthorizeView Roles="Administrador">
+                    <li class="nav-item" b-test><NavLink class="nav-link" href="dashboard"> Dashboard</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="usuarios"> Usuarios</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="categorias"> Categorias</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="productos"> Productos</NavLink></li>
+                </AuthorizeView>
+
 
                 <li class="nav-item"><NavLink class="nav-link" href="catalogo"> Tienda</NavLink></li>
             </ul>
-
-
-            <span class="navbar-text me-3">
-                admins@example.com
-            </span>
+             <AuthorizeView Roles ="Administrador">
+                 <Authorized>
+                     <span class="navbar-text me-3">
+                         @context.User.Claims.Where(c=>c.Type==ClaimTypes.Email).Select(c=>c.Value).SingleOrDefault()
+                     </span>
+                 </Authorized>
+            </AuthorizeView>
 
             <a class="btn btn-outline-dark ms-auto ms-md-0 me-3" href="/cart">
-                <i class="bi-cart-fill me-1"></i>
-                Cart
-                <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M17 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M1 2v2h2l3.6 7.59l-1.36 2.45c-.15.28-.24.61-.24.96a2 2 0 0 0 2 2h12v-2H7.42a.25.25 0 0 1-.25-.25c0-.05.01-.09.03-.12L8.1 13h7.45c.75 0 1.41-.42 1.75-1.03l3.58-6.47c.07-.16.12-.33.12-.5a1 1 0 0 0-1-1H5.21l-.94-2M7 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2" /></svg>
+                <span class="badge bg-dark text-white ms-1 rounded-pill">
+                    @mostrarCantidadCarrito()
+                </span>
             </a>
 
-            <button class="btn btn-outline-dark ms-auto ms-md-0 me-3" type="button">Salir</button>
+            <AuthorizeView>
+                 <Authorized>
+                    <button class="btn btn-outline-dark ms-auto ms-md-0 me-3" type="button" @onclick="CerrarSesion">Salir</button>
+                 </Authorized>
 
-            <a class="btn btn-outline-dark ms-auto ms-md-0 me-3" href="/login">Iniciar sesion</a>
+                 <NotAuthorized>
+                    <a class="btn btn-outline-dark ms-auto ms-md-0 me-3" href="/login">Iniciar sesion</a>
+                 </NotAuthorized>
+            </AuthorizeView>
+
+
+
 
         </div>
     </div>
 </nav>
 
 @code {
+
+
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -44,4 +73,29 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
+
+    protected override void OnInitialized()
+    {
+        carritoServicio.MostrarItems += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        carritoServicio.MostrarItems -= StateHasChanged;
+    }
+
+    private int mostrarCantidadCarrito()
+    {
+        return carritoServicio.CantidadProductos();
+    }
+
+    private async Task CerrarSesion()
+    {
+        var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
+
+        await autenticacionExt.ActualizarEstadoAutenticacion(null);
+        _navigationManager.NavigateTo("/",true);
+    }
+
 }

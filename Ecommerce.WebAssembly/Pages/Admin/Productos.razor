@@ -1,9 +1,12 @@
 ﻿@page "/productos"
 
 @inject IProductoServicio productoServicio
+
 @inject IToastService toastService
 @inject SweetAlertService Swal
 
+
+@attribute [Authorize(Roles = "Administrador")]
 
 <div class="row justify-content-center  mt-3">
     <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
@@ -13,7 +16,7 @@
     </div>
     <div class="col-sm-6 col-md-8 col-xl-9 mb-4">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Buscar producto..." @bind-value="buscar">
+            <input type="text" class="form-control" @onkeyup="OnKeyUp" placeholder="Buscar producto..." @bind-value="buscar">
             <button class="btn btn-outline-secondary" type="button" @onclick="(async()=> await ObtenerProductos(buscar))">
                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 8 8"><path fill="currentColor" d="M3.5 0C1.57 0 0 1.57 0 3.5S1.57 7 3.5 7c.59 0 1.17-.14 1.66-.41a1 1 0 0 0 .13.13l1 1a1.02 1.02 0 1 0 1.44-1.44l-1-1a1 1 0 0 0-.16-.13c.27-.49.44-1.06.44-1.66c0-1.93-1.57-3.5-3.5-3.5zm0 1C4.89 1 6 2.11 6 3.5c0 .66-.24 1.27-.66 1.72l-.03.03a1 1 0 0 0-.13.13c-.44.4-1.04.63-1.69.63c-1.39 0-2.5-1.11-2.5-2.5s1.11-2.5 2.5-2.5z" /></svg>
             </button>
@@ -25,8 +28,10 @@
 
     @if (loading)
     {
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div class="col-sm-9 text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
     }
     else
@@ -89,9 +94,11 @@
             }
             else
             {
+            <div class="col-sm-9 text-center">
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
+            </div>
             }
     }
 
@@ -102,7 +109,7 @@
     private string buscar = "";
     private bool loading = false;
 
-    private void OnKeyPress(KeyboardEventArgs e)
+    private void OnKeyUp(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {

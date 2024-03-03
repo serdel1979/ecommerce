@@ -2,6 +2,7 @@
 
 @inject IProductoServicio productoServicio
 @inject ICategoriaServicio categoriaServicio
+@inject ICarritoServicio carritoServicio
 @inject IToastService toastService
 @inject SweetAlertService Swal
 @inject NavigationManager _navServicio
@@ -60,13 +61,26 @@ else
     [Parameter]
     public int id { get; set; }
 
-    private int cantidad = 0;
+    private int cantidad = 1;
 
     private ProductoDTO modelo = new ProductoDTO();
 
     private async Task AgregarCarrito(ProductoDTO modelo)
     {
-        
+
+        if (cantidad < 0) return;
+        decimal? precioFinal = (modelo.Preciooferta != 0 && modelo.Preciooferta < modelo.Precio) ? precioFinal = modelo.Preciooferta : precioFinal = modelo.Precio;
+
+        CarritoDTO carrito = new CarritoDTO()
+            {
+                Producto = modelo,
+                Precio = precioFinal,
+                Total = Convert.ToDecimal(cantidad) * precioFinal,
+                Cantidad = cantidad
+            };
+
+        await carritoServicio.AgregarCarrito(carrito);
+
     }
 
 
@@ -74,8 +88,6 @@ else
     {
         if (id != 0)
         {
-
-
 
             var response = await productoServicio.Obtener(id);
 

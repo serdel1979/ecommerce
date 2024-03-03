@@ -37,6 +37,7 @@ builder.Services.AddScoped<IVentaServicio, VentaServicio>();
 
 builder.Services.AddScoped<IDashboardServicio, DashboardServicio>();
 
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
