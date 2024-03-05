@@ -19,7 +19,7 @@
                         <DataAnnotationsValidator></DataAnnotationsValidator>
 
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="inputEmail" type="text" placeholder="name@example.com" @bind-value="modelo.Nombrecompleto" autocomplete="off" />
+                            <input class="form-control" id="inputName" type="text" placeholder="Jhon" @bind-value="modelo.Nombrecompleto" autocomplete="off" />
                             <label for="inputEmail">Nombre Completo</label>
                             <ValidationMessage For="@(()=>modelo.Nombrecompleto)" />
                         </div>
@@ -77,7 +77,7 @@
         }
         else
         {
-            toastService.ShowError("Su cuenta no pudo ser creada");
+            toastService.ShowError(response.Mensaje);
         }
     }
 

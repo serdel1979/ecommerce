@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,19 +30,21 @@ namespace Ecommerce.Servicio.Implementacion
         {
             try
             {
-                var consulta = _modeloRepositorio.Consultar(p => p.Correo == modelo.Correo && p.Clave == modelo.Clave);
+                var consulta = _modeloRepositorio.Consultar(p => p.Correo == modelo.Correo);
                 var fromDbModelo = await consulta.FirstOrDefaultAsync();
 
                 if (fromDbModelo != null)
                 {
-                    return _mapper.Map<SesionDTO>(fromDbModelo);
-                }
-                else
-                {
-                    throw new TaskCanceledException("No se encontraron coincidencias");
+                    // Verificar la contraseña
+                    if (VerifyPassword(modelo.Clave, fromDbModelo.Clave))
+                    {
+                        // La contraseña es correcta, devolver el DTO de sesión
+                        return _mapper.Map<SesionDTO>(fromDbModelo);
+                    }
                 }
 
-
+                // Si el usuario no existe o la contraseña es incorrecta, lanzar excepción
+                throw new TaskCanceledException("No se encontraron coincidencias");
             }
             catch(Exception ex)
             {
@@ -53,6 +56,15 @@ namespace Ecommerce.Servicio.Implementacion
         {
             try
             {
+                var consulta = _modeloRepositorio.Consultar(p => p.Correo == modelo.Correo);
+                var fromDbModelo = await consulta.FirstOrDefaultAsync();
+
+                if (fromDbModelo != null)
+                {
+                    throw new TaskCanceledException("Esa cuenta de email ya existe!!!");
+                }
+
+                modelo.Clave = HashPassword(modelo.Clave);
                 var dbModelo = _mapper.Map<Usuario>(modelo);
                 var respModelo = await _modeloRepositorio.Crear(dbModelo);
 
@@ -71,6 +83,45 @@ namespace Ecommerce.Servicio.Implementacion
             }
         }
 
+        private string HashPassword(string password)
+        {
+            // Puedes utilizar un algoritmo de hash seguro, por ejemplo, SHA-256
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Convertir la contraseña en bytes
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                // Convertir los bytes del hash a una representación de cadena
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+
+                return builder.ToString();
+            }
+        }
+
+        private bool VerifyPassword(string enteredPassword, string storedHashedPassword)
+        {
+            // Utilizar el mismo algoritmo de hash (por ejemplo, SHA-256) y comparar los hashes
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Convertir la contraseña proporcionada en bytes
+                byte[] enteredBytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(enteredPassword));
+
+                // Convertir los bytes del hash a una representación de cadena
+                StringBuilder enteredBuilder = new StringBuilder();
+                for (int i = 0; i < enteredBytes.Length; i++)
+                {
+                    enteredBuilder.Append(enteredBytes[i].ToString("x2"));
+                }
+
+                // Comparar los hashes
+                return storedHashedPassword.Equals(enteredBuilder.ToString(), StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         public async Task<bool> Editar(UsuarioDTO modelo)
         {
             try
@@ -80,9 +131,9 @@ namespace Ecommerce.Servicio.Implementacion
 
                 if(fromModelo != null)
                 {
+                    modelo.Clave = HashPassword(modelo.Clave);
                     fromModelo.Nombrecompleto = modelo.Nombrecompleto;
                     fromModelo.Correo = modelo.Correo;
-                    fromModelo.Clave = modelo.Clave;
                     var resp = await _modeloRepositorio.Editar(fromModelo);
 
                     if (!resp)
