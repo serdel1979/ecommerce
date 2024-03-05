@@ -1,0 +1,30 @@
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Ecommerce.API/Ecommerce.API.csproj", "Ecommerce.API/"]
+COPY ["Ecommerce.Servicio/Ecommerce.Servicio.csproj", "Ecommerce.Servicio/"]
+COPY ["Ecommerce.DTO/Ecommerce.DTO.csproj", "Ecommerce.DTO/"]
+COPY ["Ecommerce.Model/Ecommerce.Modelo.csproj", "Ecommerce.Model/"]
+COPY ["Ecommerce.Repositorio/Ecommerce.Repositorio.csproj", "Ecommerce.Repositorio/"]
+COPY ["Ecommerce.Utilidades/Ecommerce.Utilidades.csproj", "Ecommerce.Utilidades/"]
+RUN dotnet restore "./Ecommerce.API/./Ecommerce.API.csproj"
+COPY . .
+WORKDIR "/src/Ecommerce.API"
+RUN dotnet build "./Ecommerce.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Ecommerce.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Ecommerce.API.dll"]
