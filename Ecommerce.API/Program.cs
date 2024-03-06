@@ -67,7 +67,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
-
 app.UseCors("nueva");
 
 app.UseAuthorization();
