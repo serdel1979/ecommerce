@@ -6,5 +6,6 @@ services:
     build:
       context: .
       dockerfile: Ecommerce.API/Dockerfile
-#    ports:
-#      - "8080:7295"  # Mapear el puerto 80 del contenedor al puerto 8080 del host
+    ports:
+        - "8080:5227"  # Mapear el puerto 5227 del contenedor al puerto 8080 del host para HTTP
+        - "8081:7295"  # Mapear el puerto 7295 del contenedor al puerto 8081 del host para HTTPS- 
