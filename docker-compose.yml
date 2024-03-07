@@ -7,5 +7,15 @@ services:
       context: .
       dockerfile: Ecommerce.API/Dockerfile
     ports:
-        - "8080:5227"  # Mapear el puerto 5227 del contenedor al puerto 8080 del host para HTTP
-        - "8081:7295"  # Mapear el puerto 7295 del contenedor al puerto 8081 del host para HTTPS- 
+      - 5227:5227
+      - 7295:7295
+
+  ecommerce.webassembly:
+    image: ${DOCKER_REGISTRY-}ecommercewebassembly
+    build:
+      context: .
+      dockerfile: Ecommerce.WebAssembly/Dockerfile
+    ports:
+      - 7186:7186
+      - 5167:5167
+  
