@@ -1,4 +1,3 @@
-# Imagen base
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 
 # Establecer el directorio de trabajo
@@ -16,10 +15,11 @@ RUN dotnet restore Ecommerce.WebAssembly/Ecommerce.WebAssembly.csproj
 COPY Ecommerce.WebAssembly/ ./Ecommerce.WebAssembly/
 COPY Ecommerce.DTO/ ./Ecommerce.DTO/
 WORKDIR /app/Ecommerce.WebAssembly
-RUN dotnet publish -c Release -o out
+RUN dotnet build -c Release -o /app/build
+RUN dotnet publish -c Release -o /app/publish
 
 # Generar imagen de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/Ecommerce.WebAssembly/out .
-ENTRYPOINT ["dotnet", "Ecommerce.WebAssembly/bin/Debug/net8.0/Ecommerce.WebAssembly.dll"]
+COPY --from=build-env /app/publish .
+ENTRYPOINT ["dotnet", "Ecommerce.WebAssembly.dll"]
