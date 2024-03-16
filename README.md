@@ -27,17 +27,17 @@ git clone https://github.com/serdel1979/ecommerce.git
 
     - Crea una base de datos llamada ecommerce:
 
-   ![Base de datos](IMG/postgrescreate.png){ width=50% }
+   ![Base de datos](IMG/postgrescreate.png)
 
 2. **Base de datos Postgres:**
 
     - Importar ecommerce.sql de la raíz del proyecto clonado
 
-   ![Base de datos](IMG/restore1.png){ width=50% }
+   ![Base de datos](IMG/restore1.png)
 
     - Seleccionar ecommerce.sql desde la raíz del proyecto clonado
 
-   ![Base de datos](IMG/restore2.png){ width=50% }
+   ![Base de datos](IMG/restore2.png)
 
 3. **Backend (Web API):**
    - Navega al directorio del proyecto backend:
