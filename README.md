@@ -35,7 +35,7 @@ git clone https://github.com/serdel1979/ecommerce.git
 
    ![Base de datos](IMG/restore1.png){ width=50% }
 
-    - Importar ecommerce.sql de la raíz del proyecto clonado
+    - Seleccionar ecommerce.sql desde la raíz del proyecto clonado
 
    ![Base de datos](IMG/restore2.png){ width=50% }
 
