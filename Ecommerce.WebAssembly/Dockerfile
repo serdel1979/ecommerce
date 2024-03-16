@@ -21,5 +21,5 @@ RUN dotnet publish -c Release -o /app/publish
 # Generar imagen de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/publish .
+COPY --from=build-env /app/build .
 ENTRYPOINT ["dotnet", "Ecommerce.WebAssembly.dll"]
