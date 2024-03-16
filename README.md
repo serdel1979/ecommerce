@@ -8,7 +8,9 @@
 
 Este repositorio contiene una demostración de un sistema de comercio electrónico desarrollado con .NET, utilizando una arquitectura en capas. La aplicación consta de un Web API para el backend y un frontend implementado con Blazor.
 
+![Tienda](IMG/login.png)
 
+![Tienda](IMG/admin.png)
 
 ## Clonar y Ejecutar Localmente
 
@@ -21,20 +23,29 @@ git clone https://github.com/serdel1979/ecommerce.git
 ```
 
 ### Configuración del Proyecto
+1. **Base de datos Postgres:**
 
-1. **Backend (Web API):**
+    - Crea una base de datos llamada ecommerce:
+
+   ![Base de datos](IMG/postgrescreate.png){ width=50% }
+
+2. **Base de datos Postgres:**
+
+    - Importar ecommerce.sql de la raíz del proyecto clonado
+
+   ![Base de datos](IMG/restore1.png){ width=50% }
+
+    - Importar ecommerce.sql de la raíz del proyecto clonado
+
+   ![Base de datos](IMG/restore2.png){ width=50% }
+
+3. **Backend (Web API):**
    - Navega al directorio del proyecto backend:
      ```
      cd ecommerce/Ecommerce.Api
      ```
    - Asegúrate de tener configurada una cadena de conexión válida en el archivo `appsettings.json` para tu base de datos.
 
-2. **Frontend (Blazor):**
-   - Navega al directorio del proyecto frontend:
-     ```
-     cd ../EcommerceDemo.Client
-     ```
-   - Abre el archivo `appsettings.json` y asegúrate de que la URL del servidor API sea correcta.
 
 ### Ejecutar el Proyecto
 
@@ -52,6 +63,12 @@ git clone https://github.com/serdel1979/ecommerce.git
 
 ### Acceder a la Aplicación
 
-Una vez que ambos servidores estén en funcionamiento, abre tu navegador web y visita `http://localhost:5000` para acceder al frontend de la aplicación.
+Una vez que ambos servidores estén en funcionamiento, abre tu navegador web y visita `http://localhost:<puerto>` para acceder al frontend de la aplicación.
+
+
+### Credenciales de acceso
+- Ingresa con el usuario: morgan@mail.com
+
+- Ingresa la clave: morgan
 
 ¡Disfruta explorando la demostración de este sistema de comercio electrónico!
