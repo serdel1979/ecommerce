@@ -1,7 +1,7 @@
 # Ecommerce Demo
 
 
-¡Bienvenido a mi proyecto! Aquí tienes una imagen de nuestro logo:
+¡Bienvenido al demo Ecommerce!
 
 ![Tienda](IMG/tienda.png)
 
@@ -16,6 +16,9 @@ Este repositorio contiene una demostración de un sistema de comercio electróni
 
 Para clonar este repositorio a tu máquina local, utiliza el siguiente comando:
 
+```
+git clone https://github.com/serdel1979/ecommerce.git
+```
 
 ### Configuración del Proyecto
 
